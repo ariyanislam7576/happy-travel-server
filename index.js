@@ -36,14 +36,27 @@ async function run() {
             const id = req.params.id
             const query = { _id: ObjectId(id) }
             const result = await serviceCollection.findOne(query)
-            res.json(result)
+            res.send(result)
           })
         // post api 
         app.post('/addservice', async (req, res) => {
             const newService = req.body
             const result = serviceCollection.insertOne(newService)
             console.log('getting new service', newService);
-            res.send(result)
+            res.json(result)
+        })
+
+        //post user api
+        // app.post('/login',async(req,res)=>{
+        //     user = req.body
+        //     const result = 
+        // })
+
+        //post orders
+        app.post('/orders',async(req,res)=> {
+            const order = req.body
+            console.log('getting order' ,order);
+            res.send('order procces')
         })
 
 
