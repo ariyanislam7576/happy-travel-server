@@ -4,7 +4,8 @@ const cors = require('cors')
 require('dotenv').config()
 const ObjectId = require('mongodb').ObjectId;
 const { query } = require('express');
-const orderId = require('mongodb').ObjectId
+const orderId = require('mongodb').ObjectId;
+const e = require('express');
 
 
 
@@ -30,42 +31,41 @@ async function run() {
         const serviceCollection = database.collection("serviceCollection");
         const orderCollection = database.collection("order")
 
-        //get api
+        //get addService api
         app.get('/addservice', async (req, res) => {
             const cursor = serviceCollection.find({})
             const result = await cursor.toArray()
             res.send(result)
         })
-        //get single api
+        //get  singleService api
         app.get("/addservice/:id", async (req, res) => {
             const id = req.params.id
             const query = { _id: ObjectId(id) }
             const result = await serviceCollection.findOne(query)
             res.send(result)
         })
-
-        app.get("/manageorders", async (req, res) => {
-            const cursor = await orderCollection.find({})
+        //get orders api
+        app.get("/myorder", async (req, res) => {
+            let query = {}
+            const email = req.query.email;
+            if (email) {
+                query = { email: email }
+            }
+            const cursor = await orderCollection.find(query)
             const result = await cursor.toArray()
             res.send(result)
         })
 
-        app.get("/manageorders/:id", async (req, res) => {
-            const id = req.params.id
-            const query = { _id: orderId(id) }
-            const result = await orderCollection.findOne(query)
-            res.send('getting soon', result)
-        })
 
 
-
-        // post api 
+        // post addService api 
         app.post('/addservice', async (req, res) => {
             const newService = req.body
             const result = serviceCollection.insertOne(newService)
             console.log('getting new service', newService);
             res.json(result)
         })
+
 
 
         //post orders
@@ -75,6 +75,16 @@ async function run() {
             console.log('getting order', order);
             res.json(result)
         })
+        //delete api
+        app.delete('/myorder/:id', async (req, res) => {
+            const id = req.params.id
+            console.log(id);
+            const query = { _id: ObjectId(id) }
+            const result = await orderCollection.deleteOne(query)
+            res.json(result)
+        })
+
+
 
 
     }
