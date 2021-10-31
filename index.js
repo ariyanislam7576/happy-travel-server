@@ -2,7 +2,8 @@ const express = require('express')
 const { MongoClient } = require('mongodb');
 const cors = require('cors')
 require('dotenv').config()
-const ObjectId = require('mongodb').ObjectId
+const ObjectId = require('mongodb').ObjectId;
+const { query } = require('express');
 
 
 
@@ -13,6 +14,8 @@ const port = process.env.PORT || 4500
 //user Name = travel420
 //user pas = 0mldwJ3kTTs8DytJ
 
+app.use(cors())
+app.use(express.json())
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ox5tn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -24,6 +27,7 @@ async function run() {
         console.log('connected database');
         const database = client.db("service");
         const serviceCollection = database.collection("serviceCollection");
+        const orderCollection = database.collection("order")
 
         //get api
         app.get('/addservice', async (req, res) => {
@@ -37,7 +41,23 @@ async function run() {
             const query = { _id: ObjectId(id) }
             const result = await serviceCollection.findOne(query)
             res.send(result)
-          })
+        })
+
+        app.get("/manageorders", async (req, res) => {
+            const cursor = await orderCollection.find({})
+            const result = await cursor.toArray()
+            res.send(result)
+        })
+
+        app.get("/manageorders/:id", async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const result = await orderCollection.find(query)
+            res.send('getting soon', result)
+        })
+
+
+
         // post api 
         app.post('/addservice', async (req, res) => {
             const newService = req.body
@@ -46,17 +66,13 @@ async function run() {
             res.json(result)
         })
 
-        //post user api
-        // app.post('/login',async(req,res)=>{
-        //     user = req.body
-        //     const result = 
-        // })
 
         //post orders
-        app.post('/orders',async(req,res)=> {
+        app.post('/manageorders', async (req, res) => {
             const order = req.body
-            console.log('getting order' ,order);
-            res.send('order procces')
+            const result = orderCollection.insertOne(order)
+            console.log('getting order', order);
+            res.json(result)
         })
 
 
