@@ -4,6 +4,7 @@ const cors = require('cors')
 require('dotenv').config()
 const ObjectId = require('mongodb').ObjectId;
 const { query } = require('express');
+const orderId = require('mongodb').ObjectId
 
 
 
@@ -51,8 +52,8 @@ async function run() {
 
         app.get("/manageorders/:id", async (req, res) => {
             const id = req.params.id
-            const query = { _id: ObjectId(id) }
-            const result = await orderCollection.find(query)
+            const query = { _id: orderId(id) }
+            const result = await orderCollection.findOne(query)
             res.send('getting soon', result)
         })
 
